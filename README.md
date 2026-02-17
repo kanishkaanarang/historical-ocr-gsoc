@@ -1,104 +1,204 @@
-# Historical OCR using CNN–BiLSTM with CTC Loss
+# 📜 Historical OCR using CNN–BiLSTM with CTC Loss
 
-This project implements an end-to-end Optical Character Recognition (OCR)
-pipeline for historical-style text using a CNN–BiLSTM architecture trained
-with Connectionist Temporal Classification (CTC) loss.
+An end-to-end Optical Character Recognition (OCR) pipeline for historical-style text using a CNN–BiLSTM architecture trained with Connectionist Temporal Classification (CTC) loss.
 
-The goal of this work is to build a clear, extensible OCR baseline that can
-later be adapted to Renaissance-era and other historical documents where
-labeled data is scarce and text layouts are irregular.
+This repository serves as a research-oriented baseline for Renaissance and historical document transcription, aligned with HumanAI’s GSoC 2026 OCR proposal.
 
 ---
 
-## Motivation
+## 🎯 Project Objective
 
-Digitizing historical documents is challenging due to noisy images, degraded
-paper, irregular fonts, and the lack of large annotated datasets. Traditional
-OCR systems often perform poorly on such material.
+Historical documents pose challenges including:
 
-This project focuses on understanding and implementing the core components
-of a modern OCR system, emphasizing interpretability, modular design, and
-practical experimentation rather than state-of-the-art performance.
+- Irregular typography  
+- Degraded print  
+- Rare characters and symbols  
+- Limited labeled datasets  
 
----
+This project builds a modular, explainable OCR pipeline that:
 
-## Methodology
-
-The OCR pipeline consists of the following stages:
-
-1. **Synthetic Data Generation**
-   - Text strings are programmatically generated and rendered into grayscale
-     images using PIL.
-   - Weighted character sampling is used to oversample less frequent symbols
-     and stabilize early CTC training.
-
-2. **Feature Extraction (CNN)**
-   - A convolutional neural network extracts visual features such as strokes
-     and character shapes from the input image.
-
-3. **Sequence Modeling (BiLSTM)**
-   - CNN feature maps are interpreted as a left-to-right sequence.
-   - A bidirectional LSTM models contextual dependencies between characters.
-
-4. **Alignment-Free Training (CTC Loss)**
-   - CTC loss enables training without explicit character-level alignment
-     between image regions and text labels.
-
-5. **Decoding and Evaluation**
-   - Greedy CTC decoding is used for inference.
-   - Predictions are compared against ground truth to analyze systematic
-     character-level errors.
+- Learns character recognition directly from images  
+- Handles sequence alignment without manual segmentation  
+- Provides measurable evaluation metrics  
+- Can be extended to Renaissance-era Spanish print  
 
 ---
 
-## Data
+## 🧠 Architecture Overview
 
-At the current stage, training is performed entirely on synthetic data.
-This approach allows controlled experimentation, avoids licensing issues,
-and mirrors common practice in historical OCR research.
+Image (64x256 grayscale)
+↓
+CNN (feature extraction)
+↓
+BiLSTM (sequence modeling)
+↓
+Linear projection
+↓
+CTC Loss
+↓
+Greedy / Beam Search Decoding
+---
 
-The pipeline is designed so that real historical text images can be
-integrated later without architectural changes.
+### 1️⃣ CNN – Visual Feature Extraction
+
+The convolutional network learns:
+
+- Stroke patterns  
+- Character shapes  
+- Local spatial structure  
+
+It converts the 2D image into a feature map interpreted as a left-to-right sequence.
 
 ---
 
-## Results and Observations
+### 2️⃣ BiLSTM – Context Modeling
 
-The model successfully learns to produce non-trivial character sequences
-and preserves correct character ordering in many cases. Errors are typically
-small and structured, such as confusions between visually similar characters
-or collapsed repeated symbols, which are expected behaviors in early-stage
-CTC-based OCR systems.
+The bidirectional LSTM:
 
-These results confirm that the OCR pipeline is functionally correct and
-provide a solid foundation for further improvements.
+- Processes the feature sequence in both directions  
+- Captures contextual dependencies between characters  
+- Improves recognition of ambiguous shapes  
 
 ---
 
-## Project Structure
+### 3️⃣ CTC Loss – Alignment-Free Training
 
-data/ - synthetic data generation and storage
-models/ - CNN–BiLSTM OCR model definition
-dataset/ - dataset loading and encoding
-training/ - training loop with CTC loss
-inference/ - prediction and evaluation scripts
-utils/ - character set and CTC decoding utilities
+Connectionist Temporal Classification (CTC):
+
+- Eliminates need for character-level bounding boxes  
+- Learns alignment between image features and text  
+- Handles variable-length sequences  
+
+This is standard in modern OCR systems.
 
 ---
+
+## 🧪 Synthetic Data Generation
+
+Since historical labeled data is scarce, training is performed on synthetic data generated using:
+
+- Weighted character sampling  
+- Word-level and phrase-level text  
+- Multi-word sequences  
+- Randomized lengths  
+- Centered rendering using PIL  
+
+This mirrors common practice in historical OCR research.
+
+---
+
+## 📊 Evaluation Metrics
+
+Implemented metrics:
+
+- Character Error Rate (CER)  
+- Word Error Rate (WER)  
+- Character Accuracy  
+- Word Accuracy  
+
+---
+
+## 📈 Current Results (Synthetic Dataset)
+
+Training setup:
+
+- 10,000 synthetic samples  
+- 15 epochs  
+- CPU training  
+- Train/Validation split  
+
+### Performance
+
+| Metric | Value |
+|--------|--------|
+| Character Accuracy | 95.29% |
+| Word Accuracy | 83.33% |
+| Average CER | 0.047 |
+| Average WER | 0.166 |
+
+### Observed Error Types
+
+- Missing trailing digits  
+- Rare character confusion  
+- Minor spelling distortions  
+- Slight truncation in long phrases  
+
+These behaviors are typical for early-stage CTC-based OCR systems.
+
+---
+
+## 🔍 Decoding Methods
+
+### Greedy Decoding
+Selects the most probable character at each timestep.
+
+### Beam Search Decoding
+Maintains multiple candidate sequences to improve stability and reduce local errors.
+
+---
+
+## 📂 Project Structure
+
+historical-ocr-gsoc/
+│
+├── data/ # Synthetic data generation
+├── dataset/ # Dataset loading and encoding
+├── models/ # CNN–BiLSTM model definition
+├── training/ # Training loop with CTC
+├── inference/ # Prediction and evaluation
+├── utils/ # Charset, CTC decoding, beam search
+├── requirements.txt
+└── README.md
+
+---
+
+## 🚀 How To Run
+
+### Install dependencies
+
+```bash
+pip install -r requirements.txt
+
+Generate synthetic data
+python data/generate_synthetic.py
+
+Train model
+python -m training.train
+
+Evaluate model
+python -m inference.evaluate
+
+```
 
 ## Future Work
 
-Planned extensions include:
-- Lexicon-aware decoding (e.g. beam search) to reduce linguistically invalid
-  predictions
-- Support for accented Spanish characters and historical glyph variants
-- Integration with text-detection tools (e.g. Hi-SAM) to enable full-page
-  historical document transcription
+Planned improvements aligned with GSoC 2026 proposal:
+
+Lexicon-constrained beam search
+
+Weighted learning for rare glyphs
+
+Spanish diacritic support
+
+Image augmentation (noise, blur, distortion)
+
+LLM-based transcription refinement
+
+Integration with page-level text detection (e.g., Hi-SAM)
+
+## Design Philosophy
+
+This repository prioritizes:
+
+Modularity
+
+Reproducibility
+
+Metric-driven evaluation
+
+Research alignment with historical OCR challenges
+
+It is intended as a foundation for expanding toward Renaissance-era Spanish transcription tasks.
 
 ---
 
-## Notes
-
-This repository is intended as a learning-oriented and research-oriented
-baseline rather than a production OCR system. Emphasis is placed on clarity,
-explainability, and incremental improvement.
