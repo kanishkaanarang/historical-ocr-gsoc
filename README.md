@@ -172,7 +172,7 @@ python -m inference.evaluate
 
 ```
 
-## Future Work
+## 🔮 Future Work
 
 Planned improvements aligned with GSoC 2026 proposal:
 
@@ -188,7 +188,7 @@ LLM-based transcription refinement
 
 Integration with page-level text detection (e.g., Hi-SAM)
 
-## Design Philosophy
+## 🧩Design Philosophy
 
 This repository prioritizes:
 
