@@ -139,16 +139,18 @@ Maintains multiple candidate sequences to improve stability and reduce local err
 
 ## 📂 Project Structure
 
+```text
 historical-ocr-gsoc/
 │
-├── data/ # Synthetic data generation
-├── dataset/ # Dataset loading and encoding
-├── models/ # CNN–BiLSTM model definition
-├── training/ # Training loop with CTC
-├── inference/ # Prediction and evaluation
-├── utils/ # Charset, CTC decoding, beam search
+├── data/               # Synthetic data generation
+├── dataset/            # Dataset loading and encoding
+├── models/             # CNN–BiLSTM model definition
+├── training/           # Training loop with CTC
+├── inference/          # Prediction and evaluation
+├── utils/              # Charset, CTC decoding, beam search
 ├── requirements.txt
 └── README.md
+```
 
 ---
 
